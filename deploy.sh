@@ -1,22 +1,30 @@
 #!/bin/bash
+# ===========================================
+# AutoGemz Full Deployment Script
+# Frontend + Backend
+# ===========================================
 
-cd /home/ubuntu/autoinspectionsfrontend
+echo "🚀 Starting full deploy..."
 
-echo "Pulling latest code..."
+# --------- Backend ---------
+echo "📦 Deploying Backend..."
+cd ~/autoinspectionsbackend || { echo "Backend folder not found"; exit 1; }
 git pull origin main
-
-echo "Installing dependencies..."
 npm install
+pm2 restart autoinspections --update-env
+echo "✅ Backend deployed!"
 
-echo "Building project..."
+# --------- Frontend ---------
+echo "🌐 Deploying Frontend..."
+cd ~/autoinspectionsfrontend || { echo "Frontend folder not found"; exit 1; }
+git pull origin main
+npm install
 npm run build
 
-echo "Deploying to nginx..."
+# Copy build folder to nginx root
 sudo rm -rf /var/www/html/*
 sudo cp -r build/* /var/www/html/
-
-echo "Restarting nginx..."
 sudo systemctl restart nginx
+echo "✅ Frontend deployed!"
 
-echo "Deployment finished!"
-
+echo "🎉 Full deployment finished!"
